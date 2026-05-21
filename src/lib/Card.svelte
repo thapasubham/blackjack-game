@@ -8,8 +8,9 @@
 </script>
 
 <div
-    class="w-24 h-36 bg-white border-2 border-black rounded-lg shadow-md
-           flex flex-col justify-between p-2 select-none"
+    class="w-24 h-36 rounded-xl bg-white border-2 border-black shadow-md
+           flex flex-col justify-between p-2 select-none duration-200
+           hover:-translate-y-2 hover:scale-105"
 >
     {#if card.faceUp}
         <div class="flex justify-between text-sm font-bold">
