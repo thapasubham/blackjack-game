@@ -1,0 +1,17 @@
+{
+  "Version": "2012-10-17",
+  "Id": "__default_policy_ID",
+  "Statement": [
+    {
+      "Sid": "__owner_statement",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "172023108358"
+      },
+      "Action": [
+        "SQS:*"
+      ],
+      "Resource": "arn:aws:sqs:eu-north-1:172023108358:first-queue"
+    }
+  ]
+}
