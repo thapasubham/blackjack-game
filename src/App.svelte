@@ -16,25 +16,31 @@
     function handleShuffle() {
         cards = shuffle(cards);
     }
-    let count = 0;
-    for (let i = 0; i < ranks.length; i++) {
-        for (let j = 0; j < suits.length; j++) {
-            cards.push({
-                id: count.toString(),
-                faceUp: false,
-                rank: ranks[i],
-                suit: suits[j],
-            });
-            count++;
-            handleShuffle();
+    function generateCard() {
+        let count = 0;
+        for (let i = 0; i < ranks.length; i++) {
+            for (let j = 0; j < suits.length; j++) {
+                cards.push({
+                    id: count.toString(),
+                    faceUp: count < 10 ? true : false,
+                    rank: ranks[i],
+                    suit: suits[j],
+                });
+                count++;
+            }
         }
-        handleShuffle();
+        cards = cards;
     }
+    onMount(() => {
+        generateCard();
+    });
 </script>
 
-<div class="bg-blue-200">
+<div class="bg-blue-100 w-auto">
     <button on:click={handleShuffle}> Shuffle </button>
-    {#each cards as card}
-        <Card {card} />
-    {/each}
+    <div class="grid grid-cols-13 gap-2">
+        {#each cards as card}
+            <Card {card} />
+        {/each}
+    </div>
 </div>

@@ -1,10 +1,37 @@
 <script lang="ts">
     import type { CardType } from "./types";
+    import { IsRed, suitSymbol } from "./utils";
 
     export let card: CardType;
+
+    const isRed = IsRed(card);
 </script>
 
-<div class="bg-amber-500 w-auto p-1">
-    {card.rank}
-    {card.suit}
+<div
+    class="w-24 h-36 bg-white border-2 border-black rounded-lg shadow-md
+           flex flex-col justify-between p-2 select-none"
+>
+    <div class="flex justify-between text-sm font-bold">
+        <span class={isRed ? "text-red-500" : "text-black"}>
+            {card.rank}
+        </span>
+        <span class={isRed ? "text-red-500" : "text-black"}>
+            {suitSymbol[card.suit]}
+        </span>
+    </div>
+
+    <div class="flex items-center justify-center text-3xl">
+        <span class={isRed ? "text-red-500" : "text-black"}>
+            {suitSymbol[card.suit]}
+        </span>
+    </div>
+
+    <div class="flex justify-between text-sm font-bold rotate-180">
+        <span class={isRed ? "text-red-500" : "text-black"}>
+            {card.rank}
+        </span>
+        <span class={isRed ? "text-red-500" : "text-black"}>
+            {suitSymbol[card.suit]}
+        </span>
+    </div>
 </div>
