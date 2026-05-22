@@ -17,21 +17,7 @@ export type rank =
 
 export const suits: suit[] = ["Heart", "Spade", "Diamond", "Club"];
 
-export const ranks: rank[] = [
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "J",
-  "Q",
-  "K",
-  "A",
-];
+export const ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11];
 
 export const suitColor: Record<suit, "red" | "black"> = {
   Heart: "red",
@@ -42,7 +28,7 @@ export const suitColor: Record<suit, "red" | "black"> = {
 
 export type CardType = {
   id: string;
-  rank: rank;
+  rank: number;
   suit: suit;
   faceUp: boolean;
 };

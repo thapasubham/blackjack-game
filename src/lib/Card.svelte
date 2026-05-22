@@ -9,9 +9,9 @@
 
 {#if card.faceUp}
     <div
-        class="w-24 h-36 rounded-xl bg-white border-2 border-black shadow-md
-        flex flex-col justify-between p-2 select-none duration-200
-        hover:-translate-y-2 hover:scale-105"
+        class="w-24 h-36 rounded-xl shadow-md backdrop-blur-none flex flex-col justify-between p-2 select-none duration-200 hover:-translate-y-2 hover:scale-105
+        bg-linear-to-t from-red-100/10 to-red-200/50
+        border-t-white/50 border-b border-l border-r-white/30 border-l-white/20 border-b-white/10"
     >
         <div class="flex justify-between text-sm font-bold">
             <span class={isRed ? "text-red-500" : "text-black"}>
@@ -43,7 +43,8 @@
     <div
         class="w-24 h-36 rounded-xl
     bg-linear-to-b from-rose-700 to-red-500
-    border-2 border-black shadow-md
+     border-black/80 shadow-md
+    border-l-4 border-b-4
     flex items-center justify-center
     select-none duration-200
     hover:-translate-y-2 hover:scale-105"

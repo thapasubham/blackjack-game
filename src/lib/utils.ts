@@ -10,3 +10,5 @@ export const suitSymbol: Record<string, string> = {
   Spade: "♠",
   Club: "♣",
 };
+export const delay = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
