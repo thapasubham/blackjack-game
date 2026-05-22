@@ -142,8 +142,18 @@
         dealerHand[lastIndex] = lastCard;
         if (dealerScore > 21) {
             status = "You won!!!";
+            endGame();
+        } else if (dealerScore > playerScore) {
+            status = "You lost!!";
+            endGame();
+        } else if (dealerScore <= dealerScore) {
+            status = "You won twin!!!";
+            endGame();
         }
         calcScore();
+    }
+    function endGame() {
+        gameRunning = false;
     }
 </script>
 
