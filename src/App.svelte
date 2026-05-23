@@ -6,7 +6,7 @@
     import { delay } from "./lib/utils";
 
     let gameRunning = false;
-    let status = "";
+    let status = "lost";
     let playerScore = 0;
     let dealerScore = 0;
     let isProcessing = false;
@@ -67,7 +67,7 @@
     async function newCard() {
         playerScore = 0;
         dealerScore = 0;
-        status = "";
+        status = "lost";
         isProcessing = true;
         Playerhands = [];
         dealerHand = [];
@@ -139,10 +139,8 @@
     }
 
     function HandleStand() {
-        // Reveal dealer's cards
         dealerHand = dealerHand.map((card) => ({ ...card, faceUp: true }));
 
-        // Recalculate true dealer score now that face-up states are true
         calcScore();
 
         if (dealerScore > 21) {
@@ -169,13 +167,18 @@
     <div
         class="w-full max-w-2xl p-6 rounded-2xl bg-linear-to-b from-[#afdd0d] to-[#afddaf] shadow-[0_0px_2px_rgba(15,23,42,0.12),0_18px_36px_rgba(15,23,42,0.28)"
     >
-        <!-- 1. ALERT / STATUS DISPLAY -->
         {#if status != ""}
             <div
                 class="w-full flex justify-center mb-4 transition-all duration-300 animate-bounce"
             >
                 <span
-                    class="text-lg font-bold uppercase tracking-wider text-lime-100 border border-lime-400/30 bg-emerald-950/80 backdrop-blur-md px-6 py-2 rounded-xl shadow-lg"
+                    class={`text-lg font-bold uppercase tracking-wider border-l-4 border-b-4  px-6 py-2 rounded-xl shadow-xl transition-colors duration-300
+                    ${
+                        status.toLowerCase().includes("lost") ||
+                        status.toLowerCase().includes("busted")
+                            ? "text-rose-200 border-rose-500/30 bg-rose-400/80 shadow-rose-950/20"
+                            : "text-lime-200 border-lime-400/30 bg-emerald-950/80 shadow-emerald-950/20"
+                    }`}
                 >
                     {status}
                 </span>
@@ -183,7 +186,6 @@
         {/if}
 
         <div class="grid gap-6">
-            <!-- 2. DEALER ROW -->
             <div
                 class="flex flex-col gap-2 bg-black/10 p-4 rounded-xl border border-white/5"
             >
@@ -203,7 +205,6 @@
                 <HandDisplay currentHand="Dealer Hand" cards={dealerHand} />
             </div>
 
-            <!-- 3. CENTRAL COMBAT / DECK REGION -->
             <div class="flex justify-center items-center py-1 gap-4">
                 <div
                     class="text-xs font-bold uppercase tracking-widest text-emerald-900/40"
@@ -223,7 +224,6 @@
 
             <div class="border-t border-emerald-800/10 my-0.5"></div>
 
-            <!-- 4. PLAYER ROW -->
             <div
                 class="flex flex-col gap-3 bg-black/10 p-4 rounded-xl border border-white/5"
             >
@@ -233,7 +233,7 @@
                         >Your Hand</span
                     >
                     <span
-                        class="text-xl font-bold uppercase tracking-wider text-lime-950 bg-white/50 backdrop-blur-md px-4 py-0.5 rounded-lg shadow-inner"
+                        class="text-xl font-bold uppercase border-l-4 border-b-4 tracking-wider text-lime-950 bg-white/90 border-gray-400 px-4 py-0.5 rounded-lg shadow-inner"
                     >
                         Score: {playerScore}
                     </span>
@@ -241,13 +241,12 @@
                 <HandDisplay cards={Playerhands} />
             </div>
 
-            <!-- 5. INTERACTION BUTTONS -->
             <div class="flex flex-col gap-4 mt-2">
                 <div class="flex justify-center gap-4">
                     <button
                         disabled={isProcessing || !gameRunning}
                         class="bg-yellow-400 hover:bg-yellow-300 text-slate-950 p-3 px-8
-                        border-b-4 border-yellow-600 active:border-b-0
+                        border-b-4 border-yellow-600 active:border-b-0 active:border-l-0 border-l-4
                         hover:-translate-y-0.5 active:translate-y-1
                         disabled:opacity-40 disabled:pointer-events-none
                         rounded-xl shadow-md transition-all duration-150 cursor-pointer text-xl font-extrabold uppercase tracking-wide"
@@ -259,7 +258,7 @@
                     <button
                         disabled={isProcessing || !gameRunning}
                         class="bg-slate-800 hover:bg-slate-700 text-white p-3 px-8
-                        border-b-4 border-slate-950 active:border-b-0
+                        border-l-4 border-b-4 border-slate-950 active:border-b-0 active:border-l-0
                         hover:-translate-y-0.5 active:translate-y-1
                         disabled:opacity-40 disabled:pointer-events-none
                         rounded-xl shadow-md transition-all duration-150 cursor-pointer text-xl font-extrabold uppercase tracking-wide"
@@ -272,7 +271,7 @@
                 <button
                     disabled={isProcessing}
                     class="bg-emerald-900 text-emerald-100 hover:bg-emerald-800 font-bold p-2.5 rounded-xl
-                    border-b-4 border-emerald-950 active:border-b-0 active:translate-y-0.5
+                    border-l-4 border-b-4 border-emerald-950 active:border-b-0 active:border-l-0 active:translate-y-0.5
                     disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer mx-auto px-10 text-sm uppercase tracking-wider shadow-sm"
                     on:click={newCard}
                 >
