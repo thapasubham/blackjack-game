@@ -11,7 +11,7 @@
     <div
         class="w-24 h-36 rounded-xl shadow-md backdrop-blur-none flex flex-col justify-between p-2 select-none duration-200 hover:-translate-y-2 hover:scale-105
         bg-linear-to-t from-red-100/10 to-red-200/50
-        border-t-white/50 border-b border-l border-r-white/30 border-l-white/20 border-b-white/10"
+        border-t-white/50 border-b-white/10 border-r-white/30 border-l-white/20 border-b border-l"
     >
         <div class="flex justify-between text-sm font-bold">
             <span class={isRed ? "text-red-500" : "text-black"}>

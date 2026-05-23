@@ -2,26 +2,25 @@
     import Card from "./lib/Card.svelte";
     import { onMount } from "svelte";
     import { ranks, suits, type CardType } from "./lib/types";
-    import { flip } from "svelte/animate";
     import HandDisplay from "./lib/HandDisplay.svelte";
     import { delay } from "./lib/utils";
-    const flipDurationMs = 300;
+
     let gameRunning = false;
-    let gameStatus = "";
     let status = "";
     let playerScore = 0;
     let dealerScore = 0;
     let isProcessing = false;
+
     const defaultCard: CardType = {
         faceUp: false,
         id: "3",
         rank: 10,
         suit: "Club",
     };
+
     let cards: CardType[] = [];
     let Playerhands: CardType[] = [];
     let dealerHand: CardType[] = [];
-
     let decks: CardType[] = [];
 
     const MAX_FACE_UP = 3;
@@ -32,20 +31,18 @@
 
         const totalToDeal = MAX_FACE_UP + 1;
         const cardsToDeal = cards.slice(0, totalToDeal);
-        console.log(cardsToDeal.length);
         decks = cards.slice(totalToDeal);
-        console.log(decks.length);
 
         for (let i = 0; i < cardsToDeal.length; i++) {
             if (i % 2 === 0) {
                 tempPlayerHand.push(cardsToDeal[i]);
                 Playerhands = tempPlayerHand;
+                calcScore();
             } else {
                 tempDealerHand.push(cardsToDeal[i]);
                 dealerHand = tempDealerHand;
             }
-
-            await delay(800);
+            await delay(500);
         }
     }
 
@@ -70,37 +67,42 @@
     async function newCard() {
         playerScore = 0;
         dealerScore = 0;
+        status = "";
         isProcessing = true;
         Playerhands = [];
         dealerHand = [];
         decks = [];
         await delay(800);
+
         let newCards = generateCard();
         cards = shuffle(newCards);
         cards = faceUp(cards);
+
         await deckHand();
         isProcessing = false;
         gameRunning = true;
-        calcScore();
     }
 
     function calcScore() {
         playerScore = reducerFunction(Playerhands);
         dealerScore = reducerFunction(dealerHand);
-        if (playerScore == 21) {
+
+        if (playerScore === 21) {
             gameRunning = false;
-            status = "You won!!!";
+            status = "Blackjack! You won!!!";
         }
         if (playerScore > 21) {
             gameRunning = false;
-            status = "You lost!!!";
+            status = "Busted! You lost!!!";
         }
     }
+
     function reducerFunction(cards: CardType[]) {
         return cards.reduce((total, card) => {
             return total + card.rank;
         }, 0);
     }
+
     function generateCard() {
         let count = 0;
         return suits.flatMap((suit) =>
@@ -120,7 +122,6 @@
     async function HandleHit() {
         if (Playerhands.length >= 5) {
             status = "Max number of cards drawn";
-
             await delay(3000);
             status = "";
             return;
@@ -130,97 +131,154 @@
             status = "The deck is empty!";
             return;
         }
+
         const drawnCard = { ...decks[0], faceUp: true };
         Playerhands = [...Playerhands, drawnCard];
         decks = decks.slice(1);
         calcScore();
     }
+
     function HandleStand() {
-        const lastIndex = dealerHand.length - 1;
-        let lastCard = dealerHand[lastIndex];
-        lastCard.faceUp = true;
-        dealerHand[lastIndex] = lastCard;
+        // Reveal dealer's cards
+        dealerHand = dealerHand.map((card) => ({ ...card, faceUp: true }));
+
+        // Recalculate true dealer score now that face-up states are true
+        calcScore();
+
         if (dealerScore > 21) {
-            status = "You won!!!";
-            endGame();
+            status = "Dealer busted! You won!!!";
         } else if (dealerScore > playerScore) {
             status = "You lost!!";
-            endGame();
-        } else if (dealerScore <= dealerScore) {
+        } else if (playerScore > dealerScore) {
             status = "You won twin!!!";
-            endGame();
+        } else {
+            status = "It's a push (Tie)!";
         }
-        calcScore();
+
+        endGame();
     }
+
     function endGame() {
         gameRunning = false;
     }
 </script>
 
-<div class=" min-h-screen p-4">
+<div
+    class="min-h-screen p-4 flex justify-center items-center bg-slate-900 select-none"
+>
     <div
-        class="mt-1 grid gap-4 scale-100! w-auto p-6 rounded-2xl transition-none bg-linear-to-b from-[#afdd0d] to-[#afddaf] shadow-[0_0px_2px_rgba(15,23,42,0.12),0_18px_36px_rgba(15,23,42,0.28)]!"
+        class="w-full max-w-2xl p-6 rounded-2xl bg-linear-to-b from-[#afdd0d] to-[#afddaf] shadow-[0_0px_2px_rgba(15,23,42,0.12),0_18px_36px_rgba(15,23,42,0.28)"
     >
-        <div
-            class="grid justify-center gap-4 animate:flip={{
-                duration: flipDurationMs,
-            }} "
-        >
-            {#if status != ""}
-                <div
-                    class="w-full flex justify-center my-3 transition-all duration-300"
+        <!-- 1. ALERT / STATUS DISPLAY -->
+        {#if status != ""}
+            <div
+                class="w-full flex justify-center mb-4 transition-all duration-300 animate-bounce"
+            >
+                <span
+                    class="text-lg font-bold uppercase tracking-wider text-lime-100 border border-lime-400/30 bg-emerald-950/80 backdrop-blur-md px-6 py-2 rounded-xl shadow-lg"
                 >
+                    {status}
+                </span>
+            </div>
+        {/if}
+
+        <div class="grid gap-6">
+            <!-- 2. DEALER ROW -->
+            <div
+                class="flex flex-col gap-2 bg-black/10 p-4 rounded-xl border border-white/5"
+            >
+                <div class="flex justify-between items-center px-1 mb-1">
                     <span
-                        class="text font-bold uppercase tracking-wider text-red-900 border-l-4 border-b-4 rounded
-border-red-900/20 px-4 py-1."
+                        class="text-sm font-bold uppercase tracking-wider text-emerald-900/60"
+                        >Dealer's House</span
                     >
-                        {status}
+                    {#if !gameRunning && dealerScore > 0}
+                        <span
+                            class="text-sm font-bold text-emerald-950 bg-white/20 px-2 py-0.5 rounded"
+                        >
+                            Score: {dealerScore}
+                        </span>
+                    {/if}
+                </div>
+                <HandDisplay currentHand="Dealer Hand" cards={dealerHand} />
+            </div>
+
+            <!-- 3. CENTRAL COMBAT / DECK REGION -->
+            <div class="flex justify-center items-center py-1 gap-4">
+                <div
+                    class="text-xs font-bold uppercase tracking-widest text-emerald-900/40"
+                >
+                    Draw Pile ({decks.length})
+                </div>
+                <div
+                    class="transform hover:scale-105 transition-transform duration-200"
+                >
+                    {#if decks.length > 0}
+                        <Card card={decks[0]} />
+                    {:else}
+                        <Card card={defaultCard} />
+                    {/if}
+                </div>
+            </div>
+
+            <div class="border-t border-emerald-800/10 my-0.5"></div>
+
+            <!-- 4. PLAYER ROW -->
+            <div
+                class="flex flex-col gap-3 bg-black/10 p-4 rounded-xl border border-white/5"
+            >
+                <div class="flex justify-between items-center px-1">
+                    <span
+                        class="text-sm font-bold uppercase tracking-wider text-emerald-900/80"
+                        >Your Hand</span
+                    >
+                    <span
+                        class="text-xl font-bold uppercase tracking-wider text-lime-950 bg-white/50 backdrop-blur-md px-4 py-0.5 rounded-lg shadow-inner"
+                    >
+                        Score: {playerScore}
                     </span>
                 </div>
-            {/if}
-            <HandDisplay cards={Playerhands} />
-            <div class="border-t border-emerald-700/10 my-1"></div>
-            <HandDisplay currentHand="Dealer Hand" cards={dealerHand} />
+                <HandDisplay cards={Playerhands} />
+            </div>
 
-            <div class="flex justify-center gap-4 mt-4">
-                <button
-                    disabled={isProcessing || !gameRunning}
-                    class="bg-yellow-400 hover:bg-yellow-300 text-slate-800 p-2 px-6
-                    border-l-4 border-b-4 border-yellow-600/80
-                    hover:-translate-y-0.5
-                    disabled:opacity-50
-                    disabled:translate-0
-                    disabled:translate-y-0 disabled:border-l-2 disabled:border-b-2
-                    active:translate-y-0 active:border-l-2 active:border-b-2 active:bg-yellow-600
-                    rounded-tl-xl rounded-br-xl rounded-tr-sm rounded-bl-sm shadow-md transition-all duration-200 cursor-pointer text-xl font-bold"
-                    on:click={HandleHit}
-                >
-                    Hit
-                </button>
+            <!-- 5. INTERACTION BUTTONS -->
+            <div class="flex flex-col gap-4 mt-2">
+                <div class="flex justify-center gap-4">
+                    <button
+                        disabled={isProcessing || !gameRunning}
+                        class="bg-yellow-400 hover:bg-yellow-300 text-slate-950 p-3 px-8
+                        border-b-4 border-yellow-600 active:border-b-0
+                        hover:-translate-y-0.5 active:translate-y-1
+                        disabled:opacity-40 disabled:pointer-events-none
+                        rounded-xl shadow-md transition-all duration-150 cursor-pointer text-xl font-extrabold uppercase tracking-wide"
+                        on:click={HandleHit}
+                    >
+                        Hit
+                    </button>
+
+                    <button
+                        disabled={isProcessing || !gameRunning}
+                        class="bg-slate-800 hover:bg-slate-700 text-white p-3 px-8
+                        border-b-4 border-slate-950 active:border-b-0
+                        hover:-translate-y-0.5 active:translate-y-1
+                        disabled:opacity-40 disabled:pointer-events-none
+                        rounded-xl shadow-md transition-all duration-150 cursor-pointer text-xl font-extrabold uppercase tracking-wide"
+                        on:click={HandleStand}
+                    >
+                        Stand
+                    </button>
+                </div>
 
                 <button
-                    disabled={isProcessing || !gameRunning}
-                    class="bg-slate-700 hover:bg-slate-600 text-white p-2 px-6
-                    border-l-4 border-b-4 border-slate-950/80
-                    disabled:opacity-50
-                    disabled:translate-0
-                    disabled:translate-y-0 disabled:border-l-2 disabled:border-b-2
-                    hover:-translate-y-0.5 active:translate-y-0 active:border-l-2 active:border-b-2 active:bg-slate-800
-                    rounded-tr-xl rounded-bl-xl rounded-tl-sm rounded-br-sm shadow-md transition-all duration-200 cursor-pointer text-xl font-bold"
-                    on:click={HandleStand}
+                    disabled={isProcessing}
+                    class="bg-emerald-900 text-emerald-100 hover:bg-emerald-800 font-bold p-2.5 rounded-xl
+                    border-b-4 border-emerald-950 active:border-b-0 active:translate-y-0.5
+                    disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer mx-auto px-10 text-sm uppercase tracking-wider shadow-sm"
+                    on:click={newCard}
                 >
-                    Stand
+                    Shuffle & Deal
                 </button>
             </div>
-            <button disabled={isProcessing} class="game-btn" on:click={newCard}>
-                Shuffle
-            </button>
-            <span>Score: {playerScore}</span>
         </div>
-        {#if decks.length > 0}
-            <Card card={decks[0]} />
-        {:else}
-            <Card card={defaultCard} />
-        {/if}
     </div>
 </div>

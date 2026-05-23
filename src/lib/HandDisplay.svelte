@@ -3,6 +3,7 @@
     import Card from "./Card.svelte";
     import type { CardType } from "./types";
     import EmptyCard from "./EmptyCard.svelte";
+
     export let cards: CardType[];
     export let currentHand: string = "Player Hand";
 </script>
@@ -14,12 +15,14 @@
         {currentHand}
     </span>
 
-    <div class="flex justify-center gap-4">
-        {#if cards.length == 0}
+    <div class="flex justify-center items-center gap-4 max-h-38 mix-h-25 py-1">
+        {#if cards.length === 0}
             <EmptyCard />
-        {:else if cards.length >= 0}
+        {:else}
             {#each cards as card (card.id)}
-                <div class="w-24 h-32 my-1 rounded-2xl">
+                <div
+                    class="w-24 h-36 rounded-xl flex items-center justify-center"
+                >
                     <Card {card} />
                 </div>
             {/each}
